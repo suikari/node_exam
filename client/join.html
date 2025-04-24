@@ -12,7 +12,8 @@
     
     <div class="card shadow rounded-4">
       <div class="card-header bg-success text-white fs-4">
-        학생 등록
+        <span v-if="stuNo == '' ">학생 등록</span>
+        <span v-else>학생 수정</span>
       </div>
       <div class="card-body">
 
@@ -63,6 +64,7 @@
     const app = Vue.createApp({
       data() {
         return {
+          stuNo : '',
           form: {
             stuNo: '',
             stuName: '',
@@ -97,6 +99,14 @@
         },
         goBack() {
           history.back();
+        }
+      },
+      mounted() {
+        const urlParams = new URLSearchParams(window.location.search);
+        this.stuNo = urlParams.get('stuNo') || '';
+
+        if (this.stuNo != ''){
+
         }
       }
     });

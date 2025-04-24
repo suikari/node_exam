@@ -47,7 +47,7 @@
       </div>
       <div class="card-footer d-flex justify-content-end gap-2">
         <button class="btn btn-secondary" @click="goBack">목록으로</button>
-        <button class="btn btn-warning" @click="editStudent">수정</button>
+        <button class="btn btn-warning" @click="fnEdit">수정</button>
       </div>
     </div>
 
@@ -74,8 +74,8 @@
         goBack() {
           history.back();
         },
-        editStudent() {
-          location.href = 'student-edit.html?stu_no=' + this.student.stu_no;
+        fnEdit() {
+          location.href = 'join.html?stuNo=' + this.student.stu_no;
         }
       },
       mounted() {
