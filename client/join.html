@@ -73,7 +73,7 @@
       },
       methods: {
         fnAdd() {
-          if (!this.form.stu_no || !this.form.stu_name || !this.form.stu_dept || !this.form.stu_grade) {
+          if (!this.form.stuNo || !this.form.stuName || !this.form.stuDept || !this.form.stuGrade) {
             alert('모든 항목을 입력해주세요.');
             return;
           }
@@ -88,7 +88,7 @@
           .then(res => res.json())
           .then(data => {
             alert('등록이 완료되었습니다!');
-            location.href = 'student-list.html';
+            location.href = 'list.html';
           })
           .catch(err => {
             console.error('에러 발생:', err);

@@ -145,13 +145,8 @@
                             return;
                         } 
 
-                        fetch('http://localhost:3000/product', {
-                            method : "DELETE",
-                            credentials : "include",
-                            headers : {
-                                "Content-type" : "application/json",
-                            },
-                            body : JSON.stringify({ productId : this.deleteNo}),
+                        fetch('http://localhost:3003/student/'+ this.deleteNo , {
+                            method : "DELETE"
                         })
                             .then((res)=> res.json())
                             .then((data) => {
