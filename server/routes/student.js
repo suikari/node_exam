@@ -80,12 +80,12 @@ router.post('/', async (req, res) => {
     }
 }) 
 
-router.delete('/', authMiddleware , async (req, res) => {
+router.delete('/', async (req, res) => {
     //res.body
-    let {productId} = req.body;
+    let {stuNo} = req.body;
 
      try {
-         const result = await db.query("DELETE FROM TBL_PRODUCT WHERE productId  = ?", [productId]);
+         const result = await db.query("DELETE FROM STUDENT WHERE stu_no  = ?", [stuNo]);
 
         res.json({
             message: "success",
