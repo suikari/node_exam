@@ -80,9 +80,9 @@ router.post('/', async (req, res) => {
     }
 }) 
 
-router.delete('/', async (req, res) => {
+router.delete('/:stuNo', async (req, res) => {
     //res.body
-    let {stuNo} = req.body;
+    let {stuNo} = req.params;
 
      try {
          const result = await db.query("DELETE FROM STUDENT WHERE stu_no  = ?", [stuNo]);
