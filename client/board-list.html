@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+      div {
+        margin-bottom: 5px;
+      }
+    </style>
+
+</head>
+<body>
+    <div id="app" class="container py-5">
+
+
+      <div class="row mb-4 g-2 align-items-center">
+        <div class="col-auto">
+          <select v-model="pageSize" class="form-select" @change="fnList">
+            <option value="5">5개씩</option>
+            <option value="10">10개씩</option>
+            <option value="15">15개씩</option>
+            <option value="20">20개씩</option>
+          </select>
+        </div>
+  
+        <div class="col-auto">
+          <select v-model="searchOption" class="form-select">
+            <option value="all">제목</option>
+          </select>
+        </div>
+  
+        <div class="col">
+          <input v-model="keyword" @keyup.enter="fnBoardSearch" class="form-control" placeholder="검색어"/>
+        </div>
+  
+        <div class="col-auto">
+          <button class="btn btn-primary" @click="fnBoardSearch">검색</button>
+        </div>
+      </div>
+
+      
+      <div class="d-flex justify-content gap-2">
+        <button class="btn btn-success" @click="fnAdd">글쓰기</button>
+        <button v-if="!isFavorite" class="btn btn-info" @click="isFavorite=true;page=1;fnList();">인기 게시글</button>
+        <button v-else class="btn btn-info" @click="isFavorite = false;page=1;fnList();">전체 게시글</button>
+      </div>
+    
+
+
+      
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-light">
+              <tr>
+                <!-- <th>선택</th> -->
+                <th>제목</th>
+                <th>작성자</th>
+                <th>조회수</th>
+                <th>작성일</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="item in list">
+                <tr>
+                  <!-- <td><input type="radio" name="productId" v-model="deleteNo" :value="item.stu_no"></td> -->
+                  <td><a href="javascript:;" @click="fnView(item.boardNo)" >{{ item.title }}</td>
+                  <td>{{ item.userName }}</td>
+                  <td>{{ item.cnt }}</td>
+                  <td>{{ item.cdatetime }}</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        
+        <nav class="d-flex justify-content-center my-4">
+          <ul class="pagination">
+            <li class="page-item" v-if="page != 1">
+              <a class="page-link" href="javascript:;" @click="fnPageMove('prev')">&laquo;</a>
+            </li>
+    
+            <li class="page-item" v-if="page > 3">
+              <a class="page-link" href="javascript:;" @click="fnPage(1)">...</a>
+            </li>
+    
+            <template v-for="num in index">
+              <li class="page-item" v-if="num >= page - 2 && num <= page + 2" :class="{ active: page === num }">
+                <a class="page-link" href="javascript:;" @click="fnPage(num)">{{ num }}</a>
+              </li>
+            </template>
+    
+            <li class="page-item" v-if="page < index - 2">
+              <a class="page-link" href="javascript:;" @click="fnPage(index)">...</a>
+            </li>
+    
+            <li class="page-item" v-if="index > 0 && page != index">
+              <a class="page-link" href="javascript:;" @click="fnPageMove('next')">&raquo;</a>
+            </li>
+          </ul>
+        </nav>
+
+
+      </div>
+
+
+</body>
+</html>
+
+
+<script>
+    
+    const app = Vue.createApp({
+                data() {
+                    return {
+                        list : [],
+                        view : [],
+                        selectNO : -1,
+                        deleteNo : "",
+                        index : 0 ,
+                        page: 1,
+	                      pageSize: 5,
+                        searchOption : 'all',
+                        keyword : '',
+                        userStatus : '',
+                        method : 'VIEW',
+                        isFavorite : false,
+                    };
+                },
+                computed: {
+
+                },
+                methods: {
+                    fnView (boardNo) {
+                        localStorage.setItem("page", this.page);
+
+                        fetch('http://localhost:3000/board/'+ boardNo, {
+                            method : "PUT",
+                            headers : {
+                                "Content-type" : "application/json",
+                            },
+                            body : JSON.stringify({
+                              method : this.method,
+                            }),
+                        })
+                            .then((res)=> res.json())
+                            .then((data) => {
+                                console.log(data);
+                                location.href = 'board-view.html?boardNo='+ boardNo;
+
+                            })
+                            .catch( err => {
+                                console.log("서버 에러");
+                            });
+
+                    }, 
+                    fnList () {
+                      offset = (this.page -1) * this.pageSize; 
+
+                        if (this.isFavorite) {
+                          url = 'http://localhost:3000/board?keyword='+ this.keyword + '&offset='+offset+'&limit='+ this.pageSize + '&favorite=y';
+                        } else {
+                          url = 'http://localhost:3000/board?keyword='+ this.keyword + '&offset='+offset+'&limit='+ this.pageSize;
+                        }
+                        fetch(url)
+                            .then((res)=> res.json())
+                            .then((data) => {
+                                console.log(data);
+                                this.list = data.list;  
+                                this.index = Math.ceil(data.cnt / this.pageSize);
+
+                            });
+                    },
+                    fnAdd () {
+                        location.href = 'board-edit.html';
+                    },
+                    fnPage(num) {
+                        this.page = num;
+                        this.fnList();
+                    },
+                    fnPageMove(direction) {
+                        if (direction === "next") this.page++;
+                        else this.page--;
+                        this.fnList();
+                    },
+                    fnBoardSearch : function(){
+                        let self = this;
+                        self.page = 1;
+                        this.fnList();
+                    },
+                },
+                mounted() {
+
+                  if(localStorage.getItem('page') == "undefined"){
+                      savedPage  = 1;
+                  } else {
+                      savedPage  = localStorage.getItem('page');
+                  }
+             
+                  this.page = savedPage ? Number(savedPage) : 1;
+                  localStorage.removeItem('page');
+
+                	this.fnList();
+                }
+            });
+
+            app.mount("#app");
+
+
+
+</script>

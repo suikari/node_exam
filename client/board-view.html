@@ -12,42 +12,36 @@
 
     <div class="card shadow rounded-4">
       <div class="card-header bg-primary text-white fs-4">
-        학생 상세정보
+        게시글 상세 보기
       </div>
       <div class="card-body">
 
         <div class="row mb-3">
-          <label class="col-sm-2 col-form-label fw-bold">학번</label>
+          <label class="col-sm-2 col-form-label fw-bold">제목</label>
           <div class="col-sm-10">
-            <p class="form-control-plaintext">{{ student.stu_no }}</p>
+            <p class="form-control-plaintext">{{ board.title }}</p>
           </div>
         </div>
 
         <div class="row mb-3">
-          <label class="col-sm-2 col-form-label fw-bold">이름</label>
+          <label class="col-sm-2 col-form-label fw-bold">작성자 이름</label>
           <div class="col-sm-10">
-            <p class="form-control-plaintext">{{ student.stu_name }}</p>
+            <p class="form-control-plaintext">{{ board.userName }}</p>
           </div>
         </div>
 
         <div class="row mb-3">
-          <label class="col-sm-2 col-form-label fw-bold">학과</label>
+          <label class="col-sm-2 col-form-label fw-bold"> 내용 </label>
           <div class="col-sm-10">
-            <p class="form-control-plaintext">{{ student.stu_dept }}</p>
-          </div>
-        </div>
-
-        <div class="row mb-3">
-          <label class="col-sm-2 col-form-label fw-bold">학년</label>
-          <div class="col-sm-10">
-            <p class="form-control-plaintext">{{ student.stu_grade }}학년</p>
+            <p class="form-control-plaintext">{{ board.contents }}</p>
           </div>
         </div>
 
       </div>
       <div class="card-footer d-flex justify-content-end gap-2">
-        <button class="btn btn-secondary" @click="goBack">목록으로</button>
         <button class="btn btn-warning" @click="fnEdit">수정</button>
+        <button class="btn btn-danger" @click="fnDelete">삭제</button>
+        <button class="btn btn-secondary" @click="goBack">목록으로</button>
       </div>
     </div>
 
@@ -57,32 +51,51 @@
     const app = Vue.createApp({
       data() {
         return {
-          student: {}
+          boardNo : '',
+          board: {}
         };
       },
       methods: {
-        fnStudent(stuNo) {
+        fnView() {
 
-          fetch('http://localhost:3003/student/' + stuNo)
+          fetch('http://localhost:3000/board/' + this.boardNo)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
-              this.student = data.list[0];
+              this.board = data.list[0];
             })
             .catch(err => console.error("불러오기 오류:", err));
         },
         goBack() {
-          history.back();
+          location.href = 'board-list.html';
         },
         fnEdit() {
-          location.href = 'join.html?stuNo=' + this.student.stu_no;
-        }
+          location.href = 'board-edit.html?boardNo=' + this.boardNo;
+        },
+        fnDelete() {
+
+          if(!confirm('정말 삭제할거?')){
+              return;
+          } 
+
+          fetch('http://localhost:3000/board/'+ this.boardNo , {
+              method : "DELETE"
+          })
+            .then((res)=> res.json())
+            .then((data) => {
+                location.href = 'board-list.html';
+              })
+            .catch( err => {
+                console.log("서버 에러");
+            });
+        },
+
       },
       mounted() {
         const urlParams = new URLSearchParams(window.location.search);
-        const stuNo = urlParams.get('stuNo');
+        this.boardNo = urlParams.get('boardNo');
 
-        this.fnStudent(stuNo);
+        this.fnView();
       }
     });
 

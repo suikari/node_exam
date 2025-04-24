@@ -1,7 +1,7 @@
 const express = require('express')
 const session = require('express-session')
 const cors = require('cors')
-const studentRouter = require('./routes/student.js')
+const boardRouter = require('./routes/board.js')
 
 
 
@@ -24,8 +24,8 @@ app.use(session({
     }
 }));
 
-app.use("/student",studentRouter);
+app.use("/board",boardRouter);
 
-app.listen(3003, ()=>{
+app.listen(3000, ()=>{
     console.log('서버 실행 중!');
 });
